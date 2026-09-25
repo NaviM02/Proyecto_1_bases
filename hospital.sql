@@ -7,8 +7,6 @@ CREATE TABLE hospital (
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-COMMENT ON TABLE hospital IS 'Almacena la información de cada hospital de la cadena.';
-
 CREATE TABLE unidad_medica (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR(80) NOT NULL UNIQUE,
@@ -17,17 +15,12 @@ CREATE TABLE unidad_medica (
     CONSTRAINT ck_unidad_medica_nombre CHECK (nombre IN ('Consulta Externa', 'Emergencias', 'Cirugía', 'Hospitalización'))
 );
 
-COMMENT ON TABLE unidad_medica IS 'Catálogo de las unidades principales de atención médica.';
-COMMENT ON CONSTRAINT ck_unidad_medica_nombre ON unidad_medica IS 'Valida que la unidad pertenezca a las cuatro unidades definidas.';
-
 CREATE TABLE especialidad (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR(120) NOT NULL UNIQUE,
     descripcion VARCHAR(250),
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
-
-COMMENT ON TABLE especialidad IS 'Catálogo de especialidades médicas disponibles.';
 
 CREATE TABLE servicio_medico (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -43,9 +36,6 @@ CREATE TABLE servicio_medico (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-COMMENT ON TABLE servicio_medico IS 'Catálogo de servicios médicos ofrecidos por cada unidad.';
-COMMENT ON CONSTRAINT ck_servicio_medico_costo ON servicio_medico IS 'Valida que el costo del servicio no sea negativo.';
-
 CREATE TABLE hospital_unidad (
     hospital_id BIGINT NOT NULL,
     unidad_medica_id BIGINT NOT NULL,
@@ -58,8 +48,6 @@ CREATE TABLE hospital_unidad (
         FOREIGN KEY (unidad_medica_id) REFERENCES unidad_medica(id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-COMMENT ON TABLE hospital_unidad IS 'Relaciona los hospitales con las unidades médicas que poseen.';
 
 CREATE TABLE clinica (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -75,8 +63,6 @@ CREATE TABLE clinica (
         FOREIGN KEY (unidad_medica_id) REFERENCES unidad_medica(id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-COMMENT ON TABLE clinica IS 'Registra las clínicas o consultorios de cada hospital.';
 
 CREATE TABLE recurso_asistencial (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -95,9 +81,6 @@ CREATE TABLE recurso_asistencial (
         FOREIGN KEY (unidad_medica_id) REFERENCES unidad_medica(id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-COMMENT ON TABLE recurso_asistencial IS 'Registra camillas, quirófanos y camas disponibles en los hospitales.';
-COMMENT ON CONSTRAINT ck_recurso_asistencial_tipo ON recurso_asistencial IS 'Valida los tipos de recurso asistencial permitidos.';
 
 -- Personas y personal
 
@@ -121,11 +104,6 @@ CREATE TABLE paciente (
     CONSTRAINT ck_paciente_fecha_nacimiento CHECK (fecha_nacimiento <= CURRENT_DATE)
 );
 
-COMMENT ON TABLE paciente IS 'Almacena la información personal y de identificación de los pacientes.';
-COMMENT ON CONSTRAINT ck_paciente_sexo ON paciente IS 'Valida el sexo permitido para el paciente.';
-COMMENT ON CONSTRAINT ck_paciente_area ON paciente IS 'Valida el área de residencia del paciente.';
-COMMENT ON CONSTRAINT ck_paciente_fecha_nacimiento ON paciente IS 'Valida que la fecha de nacimiento no sea futura.';
-
 CREATE TABLE encargado (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombres VARCHAR(100) NOT NULL,
@@ -139,9 +117,6 @@ CREATE TABLE encargado (
     CONSTRAINT ck_encargado_area CHECK (area IN ('Urbana', 'Rural'))
 );
 
-COMMENT ON TABLE encargado IS 'Registra al encargado o representante relacionado con un paciente.';
-COMMENT ON CONSTRAINT ck_encargado_area ON encargado IS 'Valida el área de residencia del encargado.';
-
 CREATE TABLE paciente_encargado (
     paciente_id BIGINT NOT NULL,
     encargado_id BIGINT NOT NULL,
@@ -154,8 +129,6 @@ CREATE TABLE paciente_encargado (
         FOREIGN KEY (encargado_id) REFERENCES encargado(id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-COMMENT ON TABLE paciente_encargado IS 'Relaciona pacientes con sus encargados o representantes.';
 
 CREATE TABLE personal_medico (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -176,10 +149,6 @@ CREATE TABLE personal_medico (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-COMMENT ON TABLE personal_medico IS 'Registra médicos, enfermeros, anestesistas y personal de apoyo clínico.';
-COMMENT ON CONSTRAINT ck_personal_medico_area ON personal_medico IS 'Valida el área de residencia cuando se registra.';
-COMMENT ON CONSTRAINT ck_personal_medico_tipo ON personal_medico IS 'Valida los tipos de personal médico permitidos.';
-
 CREATE TABLE personal_especialidad (
     personal_medico_id BIGINT NOT NULL,
     especialidad_id BIGINT NOT NULL,
@@ -193,7 +162,6 @@ CREATE TABLE personal_especialidad (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-COMMENT ON TABLE personal_especialidad IS 'Relaciona al personal médico con sus especialidades.';
 
 CREATE TABLE personal_unidad (
     personal_medico_id BIGINT NOT NULL,
@@ -211,4 +179,123 @@ CREATE TABLE personal_unidad (
         ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-COMMENT ON TABLE personal_unidad IS 'Relaciona al personal médico con las unidades donde presta servicio.';
+-- Consulta externa
+CREATE TABLE ingreso (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    paciente_id BIGINT NOT NULL,
+    hospital_id BIGINT NOT NULL,
+    unidad_medica_id BIGINT NOT NULL,
+    servicio_medico_id BIGINT NOT NULL,
+    medico_encargado_id BIGINT NOT NULL,
+    recurso_asistencial_id BIGINT,
+    motivo TEXT NOT NULL,
+    fecha_hora TIMESTAMP NOT NULL,
+    diagnostico_presuntivo TEXT NOT NULL,
+    CONSTRAINT fk_ingreso_paciente
+        FOREIGN KEY (paciente_id) REFERENCES paciente(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ingreso_hospital
+        FOREIGN KEY (hospital_id) REFERENCES hospital(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ingreso_unidad
+        FOREIGN KEY (unidad_medica_id) REFERENCES unidad_medica(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ingreso_servicio
+        FOREIGN KEY (servicio_medico_id) REFERENCES servicio_medico(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ingreso_medico
+        FOREIGN KEY (medico_encargado_id) REFERENCES personal_medico(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_ingreso_recurso
+        FOREIGN KEY (recurso_asistencial_id) REFERENCES recurso_asistencial(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE egreso (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ingreso_id BIGINT NOT NULL UNIQUE,
+    paciente_id BIGINT NOT NULL,
+    hospital_id BIGINT NOT NULL,
+    unidad_medica_id BIGINT NOT NULL,
+    servicio_medico_id BIGINT NOT NULL,
+    medico_asignado_id BIGINT NOT NULL,
+    recurso_asistencial_id BIGINT,
+    fecha_hora TIMESTAMP NOT NULL,
+    diagnostico_principal TEXT NOT NULL,
+    diagnosticos_secundarios TEXT,
+    motivo TEXT NOT NULL,
+    codigo_egreso VARCHAR(20) NOT NULL,
+    sin_consentimiento_medico BOOLEAN NOT NULL DEFAULT FALSE,
+    motivo_sin_consentimiento TEXT,
+    dias_hospitalizado INTEGER,
+    operaciones_intervenciones TEXT,
+    codigo_traslado VARCHAR(30),
+    referido_a TEXT,
+    CONSTRAINT ck_egreso_codigo CHECK (codigo_egreso IN ('Vivo', 'Muerto', 'Embarazo', 'Parto')),
+    CONSTRAINT ck_egreso_dias CHECK (dias_hospitalizado IS NULL OR dias_hospitalizado >= 0),
+    CONSTRAINT ck_egreso_motivo_consentimiento CHECK (
+        (sin_consentimiento_medico = TRUE AND motivo_sin_consentimiento IS NOT NULL)
+        OR (sin_consentimiento_medico = FALSE)
+    ),
+    CONSTRAINT fk_egreso_ingreso
+        FOREIGN KEY (ingreso_id) REFERENCES ingreso(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_paciente
+        FOREIGN KEY (paciente_id) REFERENCES paciente(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_hospital
+        FOREIGN KEY (hospital_id) REFERENCES hospital(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_unidad
+        FOREIGN KEY (unidad_medica_id) REFERENCES unidad_medica(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_servicio
+        FOREIGN KEY (servicio_medico_id) REFERENCES servicio_medico(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_medico
+        FOREIGN KEY (medico_asignado_id) REFERENCES personal_medico(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_egreso_recurso
+        FOREIGN KEY (recurso_asistencial_id) REFERENCES recurso_asistencial(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE traslado (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    paciente_id BIGINT NOT NULL,
+    medico_indica_id BIGINT NOT NULL,
+    hospital_origen_id BIGINT NOT NULL,
+    unidad_origen_id BIGINT NOT NULL,
+    servicio_origen_id BIGINT,
+    hospital_destino_id BIGINT NOT NULL,
+    unidad_destino_id BIGINT NOT NULL,
+    servicio_destino_id BIGINT,
+    fecha_hora TIMESTAMP NOT NULL,
+    tipo_traslado VARCHAR(10) NOT NULL,
+    observaciones TEXT,
+    CONSTRAINT ck_traslado_tipo CHECK (tipo_traslado IN ('Interno', 'Externo')),
+    CONSTRAINT fk_traslado_paciente
+        FOREIGN KEY (paciente_id) REFERENCES paciente(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_medico
+        FOREIGN KEY (medico_indica_id) REFERENCES personal_medico(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_hospital_origen
+        FOREIGN KEY (hospital_origen_id) REFERENCES hospital(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_unidad_origen
+        FOREIGN KEY (unidad_origen_id) REFERENCES unidad_medica(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_servicio_origen
+        FOREIGN KEY (servicio_origen_id) REFERENCES servicio_medico(id)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_hospital_destino
+        FOREIGN KEY (hospital_destino_id) REFERENCES hospital(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_unidad_destino
+        FOREIGN KEY (unidad_destino_id) REFERENCES unidad_medica(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_traslado_servicio_destino
+        FOREIGN KEY (servicio_destino_id) REFERENCES servicio_medico(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+);
