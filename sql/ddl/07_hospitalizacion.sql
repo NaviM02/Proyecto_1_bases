@@ -1,7 +1,4 @@
--- Parte 07 — Hospitalización
--- =========================================================
 -- Hospitalización
--- =========================================================
 
 -- Registra la estadía del paciente en la unidad de hospitalización.
 CREATE TABLE hospitalizacion (
@@ -15,10 +12,8 @@ CREATE TABLE hospitalizacion (
     cama_id INTEGER,
     fecha_hora_ingreso TIMESTAMP NOT NULL,
     fecha_hora_egreso TIMESTAMP,
-    -- Valida que el costo por día no sea negativo
     costo_por_dia NUMERIC(12,2) NOT NULL,
     CONSTRAINT ck_hospitalizacion_costo_dia CHECK (costo_por_dia >= 0),
-    -- Valida que el egreso no ocurra antes del ingreso
     CONSTRAINT ck_hospitalizacion_fechas
         CHECK (fecha_hora_egreso IS NULL OR fecha_hora_egreso >= fecha_hora_ingreso),
     CONSTRAINT fk_hospitalizacion_paciente

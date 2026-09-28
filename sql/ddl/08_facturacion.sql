@@ -1,7 +1,4 @@
--- Parte 08 — Facturación y pagos
--- =========================================================
 -- Facturación y pagos
--- =========================================================
 
 -- Registra las facturas emitidas por los servicios hospitalarios.
 CREATE TABLE factura (
@@ -10,9 +7,7 @@ CREATE TABLE factura (
     hospital_id INTEGER NOT NULL,
     fecha_emision TIMESTAMP NOT NULL,
     descripcion TEXT NOT NULL,
-    -- Valida que el total de la factura no sea negativo
     total NUMERIC(12,2) NOT NULL,
-    -- Valida los estados permitidos de una factura
     estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente',
     CONSTRAINT ck_factura_total CHECK (total >= 0),
     CONSTRAINT ck_factura_estado
@@ -31,9 +26,7 @@ CREATE TABLE factura_detalle (
     factura_id INTEGER NOT NULL,
     servicio_medico_id INTEGER,
     descripcion VARCHAR(250) NOT NULL,
-    -- Valida que la cantidad facturada sea mayor que cero
     cantidad NUMERIC(12,2) NOT NULL,
-    -- Valida que el precio unitario no sea negativo
     precio_unitario NUMERIC(12,2) NOT NULL,
     subtotal NUMERIC(12,2) NOT NULL,
     CONSTRAINT ck_factura_detalle_cantidad CHECK (cantidad > 0),
@@ -50,10 +43,8 @@ CREATE TABLE factura_detalle (
 CREATE TABLE pago (
     id INTEGER PRIMARY KEY,
     factura_id INTEGER NOT NULL,
-    -- Valida que la factura tenga cuotas numeradas entre 1 y 12
     numero_pago INTEGER NOT NULL,
     fecha_pago TIMESTAMP NOT NULL,
-    -- Valida que cada pago tenga un monto mayor que cero
     monto NUMERIC(12,2) NOT NULL,
     CONSTRAINT uq_pago_factura_numero UNIQUE (factura_id, numero_pago),
     CONSTRAINT ck_pago_numero CHECK (numero_pago BETWEEN 1 AND 12),
