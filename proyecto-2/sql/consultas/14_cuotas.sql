@@ -6,9 +6,9 @@ SELECT h.id, h.nombre,
 FROM (
     SELECT f.id, COUNT(p.id) AS n
     FROM factura f
-    LEFT JOIN pago p ON p.factura_id = f.id AND p.fecha_pago < :'hasta'::timestamp
+    LEFT JOIN pago p ON p.factura_id = f.id AND p.fecha_pago < TIMESTAMP '2026-11-01'
     WHERE f.estado <> 'Anulada'
-      AND f.fecha_emision >= :'desde'::timestamp AND f.fecha_emision < :'hasta'::timestamp
+      AND f.fecha_emision >= TIMESTAMP '2026-09-01' AND f.fecha_emision < TIMESTAMP '2026-11-01'
     GROUP BY f.id
 ) c
 JOIN (

@@ -9,17 +9,17 @@ JOIN (
     SELECT hospital_id, 1 AS reservas, 0 AS consultas, 0 AS proximas
     FROM cita
     WHERE estado <> 'Cancelada'
-      AND fecha_hora >= :'desde'::timestamp AND fecha_hora < :'hasta'::timestamp
+      AND fecha_hora >= TIMESTAMP '2026-09-01' AND fecha_hora < TIMESTAMP '2026-11-01'
     UNION ALL
     SELECT a.hospital_id, 0, 1, 0
     FROM consulta c JOIN cita a ON a.id = c.cita_id
-    WHERE c.fecha_hora >= :'desde'::timestamp AND c.fecha_hora < :'hasta'::timestamp
+    WHERE c.fecha_hora >= TIMESTAMP '2026-09-01' AND c.fecha_hora < TIMESTAMP '2026-11-01'
     UNION ALL
     SELECT a.hospital_id, 0, 0, 1
     FROM receta r
     JOIN consulta c ON c.id = r.consulta_id
     JOIN cita a ON a.id = c.cita_id
-    WHERE r.proxima_cita >= :'desde'::timestamp AND r.proxima_cita < :'hasta'::timestamp
+    WHERE r.proxima_cita >= TIMESTAMP '2026-09-01' AND r.proxima_cita < TIMESTAMP '2026-11-01'
 ) e ON e.hospital_id = h.id
 GROUP BY h.id, h.nombre
 ORDER BY demanda DESC, h.id

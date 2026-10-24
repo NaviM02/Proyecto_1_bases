@@ -20,7 +20,7 @@ JOIN (
     WHERE etapa = 'Intraoperatorio' AND fecha_hora_fin IS NOT NULL
 ) e ON e.cirugia_solicitud_id = s.id
 WHERE s.estado = 'Realizada'
-  AND v.fecha_pago >= :'desde'::timestamp AND v.fecha_pago < :'hasta'::timestamp
+  AND v.fecha_pago >= TIMESTAMP '2026-09-01' AND v.fecha_pago < TIMESTAMP '2026-11-01'
 GROUP BY s.tipo_procedimiento
 ORDER BY ingresos DESC, s.tipo_procedimiento
 LIMIT 3;

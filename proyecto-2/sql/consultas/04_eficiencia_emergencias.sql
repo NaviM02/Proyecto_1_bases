@@ -11,9 +11,9 @@ SELECT h.id, h.nombre, COUNT(*) AS ingresos,
 FROM ingreso i
 JOIN hospital h ON h.id = i.hospital_id
 LEFT JOIN atencion_emergencia a ON a.ingreso_id = i.id
-LEFT JOIN egreso e ON e.ingreso_id = i.id AND e.fecha_hora < :'hasta'::timestamp
+LEFT JOIN egreso e ON e.ingreso_id = i.id AND e.fecha_hora < TIMESTAMP '2026-11-01'
 WHERE i.unidad_medica_id = 2
-  AND i.fecha_hora >= :'desde'::timestamp AND i.fecha_hora < :'hasta'::timestamp
+  AND i.fecha_hora >= TIMESTAMP '2026-09-01' AND i.fecha_hora < TIMESTAMP '2026-11-01'
 GROUP BY h.id, h.nombre
 HAVING COUNT(a.ingreso_id) > 0
 ORDER BY siempre_disponibles DESC, porcentaje_con_cama DESC, promedio_turnos_espera, h.id

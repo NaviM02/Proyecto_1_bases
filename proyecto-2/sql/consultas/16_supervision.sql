@@ -1,7 +1,7 @@
 -- Objetivo 16. Incluye el médico inicial (nivel 0), sin fijar la profundidad de la jerarquía.
 WITH RECURSIVE cadena AS (
  SELECT s.medico_id,s.hospital_id,s.superior_id,0 AS nivel,ARRAY[s.medico_id] AS ruta
- FROM medico_supervision s WHERE medico_id=:'medico_id'::integer
+ FROM medico_supervision s WHERE medico_id=1003
  UNION ALL
  SELECT s.medico_id,s.hospital_id,s.superior_id,c.nivel+1,c.ruta||s.medico_id
  FROM cadena c JOIN medico_supervision s ON s.medico_id=c.superior_id

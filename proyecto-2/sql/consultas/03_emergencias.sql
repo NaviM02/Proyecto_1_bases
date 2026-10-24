@@ -7,12 +7,12 @@ FROM personal_medico m
 JOIN (
     SELECT medico_id, hospital_id, COUNT(*) AS turnos,
            SUM(EXTRACT(EPOCH FROM (
-               CASE WHEN fin > :'hasta'::timestamp THEN :'hasta'::timestamp ELSE fin END
-               - CASE WHEN inicio < :'desde'::timestamp THEN :'desde'::timestamp ELSE inicio END
+                CASE WHEN fin > TIMESTAMP '2026-11-01' THEN TIMESTAMP '2026-11-01' ELSE fin END
+                - CASE WHEN inicio < TIMESTAMP '2026-09-01' THEN TIMESTAMP '2026-09-01' ELSE inicio END
            )) / 3600) AS horas
     FROM turno_medico
     WHERE unidad_medica_id = 2
-      AND inicio < :'hasta'::timestamp AND fin > :'desde'::timestamp
+      AND inicio < TIMESTAMP '2026-11-01' AND fin > TIMESTAMP '2026-09-01'
     GROUP BY medico_id, hospital_id
 ) t ON t.medico_id = m.id
 JOIN hospital h ON h.id = t.hospital_id
@@ -21,7 +21,7 @@ LEFT JOIN (
     FROM egreso
     WHERE unidad_medica_id = 2 AND codigo_egreso = 'Vivo'
       AND sin_consentimiento_medico = FALSE
-      AND fecha_hora >= :'desde'::timestamp AND fecha_hora < :'hasta'::timestamp
+      AND fecha_hora >= TIMESTAMP '2026-09-01' AND fecha_hora < TIMESTAMP '2026-11-01'
     GROUP BY medico_asignado_id, hospital_id
 ) e ON e.medico_asignado_id = m.id AND e.hospital_id = h.id
 ORDER BY horas DESC, turnos DESC, egresos_vivos_consentidos DESC, m.id
