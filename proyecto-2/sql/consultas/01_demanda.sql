@@ -5,6 +5,7 @@ SELECT h.id, h.nombre,
        SUM(e.proximas) AS proximas_consultas,
        SUM(e.reservas + e.consultas + e.proximas) AS demanda
 FROM hospital h
+-- Se juntan los tres tipos de actividad con UNION ALL y luego se cuentan por hospital.
 JOIN (
     SELECT hospital_id, 1 AS reservas, 0 AS consultas, 0 AS proximas
     FROM cita

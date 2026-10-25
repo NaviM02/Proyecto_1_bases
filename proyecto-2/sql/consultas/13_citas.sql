@@ -8,6 +8,7 @@ FROM cita a
 JOIN hospital h ON h.id = a.hospital_id
 JOIN paciente p ON p.id = a.paciente_id
 LEFT JOIN especialidad e ON e.id = (
+    -- Si el médico tiene varias especialidades, elige la principal; si empatan, el ID menor.
     SELECT pe.especialidad_id
     FROM personal_especialidad pe
     WHERE pe.personal_medico_id = a.medico_id

@@ -1,0 +1,4 @@
+proyecto-2/.venv/
+__pycache__/
+*.pyc
+.env

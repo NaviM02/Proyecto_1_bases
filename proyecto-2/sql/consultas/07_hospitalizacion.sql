@@ -1,4 +1,5 @@
 -- Objetivo 7. Ingresos de hospitalización, camas asignadas y costo diario promedio.
+-- Los cobros y las hospitalizaciones se resumen por hospital en bloques separados para no cruzar sus filas.
 SELECT h.id, h.nombre, ROUND(c.ingresos, 2) AS ingresos,
        u.camas_asignadas, ROUND(u.costo_promedio, 2) AS costo_promedio
 FROM hospital h

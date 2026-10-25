@@ -1,4 +1,5 @@
 -- Objetivo 12. Promedio de edad y distribución por sexo en cada turno de emergencias.
+-- El bloque t calcula el total y la edad promedio de todo el turno; luego se compara cada sexo contra ese total.
 SELECT h.id, h.nombre, b.turno, b.sexo, COUNT(*) AS ingresos,
        ROUND(AVG(b.edad), 2) AS edad_promedio_sexo,
        ROUND(100.0 * COUNT(*) / t.total_ingresos, 2) AS porcentaje_sexo,

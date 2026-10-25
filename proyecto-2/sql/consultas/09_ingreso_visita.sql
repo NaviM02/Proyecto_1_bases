@@ -1,4 +1,5 @@
 -- Objetivo 9. Una cita y su consulta representan una sola visita; se excluyen cancelaciones.
+-- Se cuentan visitas e ingresos por separado antes de calcular el ingreso promedio por visita.
 SELECT h.id, h.nombre, c.visitas, ROUND(d.ingresos, 2) AS ingresos,
        ROUND(d.ingresos / c.visitas, 2) AS ingreso_por_visita
 FROM hospital h

@@ -1,4 +1,5 @@
 -- Objetivo 5. Cirujanos con agendamientos aprobados y las tres listas de recursos documentadas.
+-- Se suman insumos, instrumentos y equipos por cirugía antes de unirlos al cirujano para evitar duplicar cantidades.
 SELECT m.id, m.nombres, COUNT(*) AS aprobados,
        SUM(ci.total) AS insumos, SUM(it.total) AS instrumentos, SUM(eq.total) AS equipos
 FROM cirugia_solicitud s

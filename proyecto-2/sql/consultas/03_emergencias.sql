@@ -1,8 +1,8 @@
 -- Objetivo 3. Horas y turnos de emergencias junto con egresos vivos consentidos.
+-- Primero se resumen los turnos y los egresos por separado para no multiplicar sus conteos al unirlos.
 SELECT m.id, m.nombres, h.nombre AS hospital,
        ROUND(t.horas, 2) AS horas, t.turnos,
-       CASE WHEN e.egresos_vivos_consentidos IS NULL THEN 0
-            ELSE e.egresos_vivos_consentidos END AS egresos_vivos_consentidos
+       COALESCE(e.egresos_vivos_consentidos, 0) AS egresos_vivos_consentidos
 FROM personal_medico m
 JOIN (
     SELECT medico_id, hospital_id, COUNT(*) AS turnos,
